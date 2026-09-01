@@ -360,17 +360,7 @@ function initializeMenu() {
             if (main) {
                 main.classList.toggle('with-collapsed-sidebar');
             }
-            localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
         });
-
-        // Restaurar estado do sidebar
-        if (localStorage.getItem('sidebarCollapsed') === 'true') {
-            sidebar.classList.add('collapsed');
-            const main = document.querySelector('main');
-            if (main) {
-                main.classList.add('with-collapsed-sidebar');
-            }
-        }
     }
 
     // Toggle submenus

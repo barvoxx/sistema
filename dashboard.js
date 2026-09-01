@@ -2,24 +2,32 @@
 // DASHBOARD - BARVOX
 // ============================================
 
-import { db, isUserAuthenticated, getUserUID, collection, doc, getDoc, getDocs, query, where, orderBy, limit } from './firebase-config.js';
+import { db, auth, getUserUID, collection, doc, getDoc, getDocs, query, where, orderBy, limit } from './firebase-config.js';
 import { getUserData } from './auth.js';
+import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
 
 let currentUserData = null;
 let chartsInstance = {};
 
-document.addEventListener('DOMContentLoaded', async () => {
-    // Verificar autenticação
-    if (!isUserAuthenticated()) {
-        window.location.href = 'index.html';
-        return;
-    }
+const isLoginPage = () => {
+    return window.location.pathname.includes('index.html') || window.location.pathname.endsWith('/');
+};
 
-    // Carregar dados do usuário
-    await loadUserData();
+document.addEventListener('DOMContentLoaded', () => {
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+            window.location.href = 'index.html';
+            return;
+        }
 
-    // Inicializar página
-    initializeDashboard();
+        if (isLoginPage()) {
+            window.location.href = 'dashboard.html';
+            return;
+        }
+
+        await loadUserData();
+        await initializeDashboard();
+    });
 });
 
 // ============================================
@@ -43,6 +51,13 @@ async function loadUserData() {
 
 async function initializeDashboard() {
     try {
+        const hasData = await dashboardHasData();
+
+        if (!hasData) {
+            resetDashboardEmptyState();
+            return;
+        }
+
         // Carregar KPIs
         await loadKPIs();
 
@@ -58,6 +73,57 @@ async function initializeDashboard() {
     } catch (error) {
         console.error('Erro ao inicializar dashboard:', error);
     }
+}
+
+async function dashboardHasData() {
+    const uid = getUserUID();
+    if (!uid) return false;
+
+    try {
+        const checks = await Promise.all([
+            getDocs(query(collection(db, 'sales', uid, 'sales'), limit(1))),
+            getDocs(query(collection(db, 'purchases', uid, 'purchases'), limit(1))),
+            getDocs(query(collection(db, 'products', uid, 'products'), limit(1))),
+            getDocs(query(collection(db, 'accounts_receivable', uid, 'accounts'), limit(1))),
+            getDocs(query(collection(db, 'accounts_payable', uid, 'accounts'), limit(1)))
+        ]);
+
+        return checks.some(snapshot => !snapshot.empty);
+    } catch (error) {
+        console.error('Erro ao verificar se há dados no dashboard:', error);
+        return false;
+    }
+}
+
+function resetDashboardEmptyState() {
+    const kpiCards = document.querySelectorAll('.kpi-card');
+    if (kpiCards.length) {
+        kpiCards[0].querySelector('.kpi-value').textContent = 'R$ 0,00';
+        kpiCards[1].querySelector('.kpi-value').textContent = 'R$ 0,00';
+        kpiCards[2].querySelector('.kpi-value').textContent = '0%';
+        kpiCards[3].querySelector('.kpi-value').textContent = 'R$ 0,00';
+    }
+
+    Object.keys(chartsInstance).forEach(key => {
+        if (chartsInstance[key]) {
+            chartsInstance[key].destroy();
+        }
+        delete chartsInstance[key];
+    });
+
+    const emptyTables = [
+        'recentSalesTable',
+        'accountsReceivableTable',
+        'accountsPayableTable',
+        'lowStockTable'
+    ];
+
+    emptyTables.forEach(tableId => {
+        const tbody = document.getElementById(tableId);
+        if (tbody) {
+            tbody.innerHTML = '<tr><td colspan="5" class="empty-message">Sem dados para exibir</td></tr>';
+        }
+    });
 }
 
 // ============================================

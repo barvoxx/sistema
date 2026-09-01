@@ -32,17 +32,8 @@ onAuthStateChanged(auth, (user) => {
     currentUser = user;
     if (user) {
         console.log('Usuário autenticado:', user.email);
-        // Redirecionar para dashboard se estiver na página de login
-        if (window.location.pathname.includes('index.html') || window.location.pathname.endsWith('/')) {
-            window.location.href = 'dashboard.html';
-        }
     } else {
         console.log('Nenhum usuário autenticado');
-        // Redirecionar para login se não estiver autenticado
-        if (!window.location.pathname.includes('index.html') && 
-            !window.location.pathname.endsWith('/')) {
-            window.location.href = 'index.html';
-        }
     }
 });
 
@@ -52,22 +43,24 @@ onAuthStateChanged(auth, (user) => {
 
 // Obter usuário autenticado
 function getCurrentUser() {
-    return currentUser;
+    return auth.currentUser || currentUser;
 }
 
 // Verificar se usuário está autenticado
 function isUserAuthenticated() {
-    return currentUser !== null;
+    return !!(auth.currentUser || currentUser);
 }
 
 // Obter UID do usuário
 function getUserUID() {
-    return currentUser ? currentUser.uid : null;
+    const user = auth.currentUser || currentUser;
+    return user ? user.uid : null;
 }
 
 // Obter email do usuário
 function getUserEmail() {
-    return currentUser ? currentUser.email : null;
+    const user = auth.currentUser || currentUser;
+    return user ? user.email : null;
 }
 
 // Exportar para uso em outros módulos

@@ -4,7 +4,6 @@
 
 import { registerUser, loginUser } from './auth.js';
 import { auth } from './firebase-config.js';
-import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     // Elementos do DOM
@@ -67,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
             showMessage('Login realizado com sucesso!', 'success');
             setTimeout(() => {
                 window.location.href = 'dashboard.html';
-            }, 1500);
+            }, 300);
         } else {
             showMessage(result.message, 'error');
             submitBtn.disabled = false;
@@ -109,13 +108,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (result.success) {
             showMessage('Conta criada com sucesso! Redirecionando...', 'success');
-            
+
             // Limpar formulário
             registerForm.reset();
 
             setTimeout(() => {
                 window.location.href = 'dashboard.html';
-            }, 1500);
+            }, 300);
         } else {
             showMessage(result.message, 'error');
             submitBtn.disabled = false;
@@ -137,13 +136,3 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// ============================================
-// VERIFICAÇÃO DE USUARIO LOGADO
-// ============================================
-
-// Se o usuário já está logado, redirecionar para dashboard
-onAuthStateChanged(auth, (user) => {
-    if (user && (window.location.pathname.includes('index.html') || window.location.pathname.endsWith('/'))) {
-        window.location.href = 'dashboard.html';
-    }
-});

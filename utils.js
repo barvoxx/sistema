@@ -295,40 +295,23 @@ function getToastColor(type) {
 }
 
 // ============================================
-// LOCAL STORAGE
+// ARMAZENAMENTO LOCAL (DESATIVADO)
 // ============================================
+// Todo o estado do sistema deve ser salvo em Firestore/Firebase e não em localStorage.
 
-// Salvar no localStorage
 function saveToStorage(key, value) {
-    try {
-        localStorage.setItem(key, JSON.stringify(value));
-        return true;
-    } catch (error) {
-        console.error('Erro ao salvar no localStorage:', error);
-        return false;
-    }
+    console.warn('Persistência local desativada. Os dados devem ficar no Firestore.');
+    return false;
 }
 
-// Carregar do localStorage
 function loadFromStorage(key) {
-    try {
-        const value = localStorage.getItem(key);
-        return value ? JSON.parse(value) : null;
-    } catch (error) {
-        console.error('Erro ao carregar do localStorage:', error);
-        return null;
-    }
+    console.warn('Persistência local desativada. Os dados devem ficar no Firestore.');
+    return null;
 }
 
-// Remover do localStorage
 function removeFromStorage(key) {
-    try {
-        localStorage.removeItem(key);
-        return true;
-    } catch (error) {
-        console.error('Erro ao remover do localStorage:', error);
-        return false;
-    }
+    console.warn('Persistência local desativada. Os dados devem ficar no Firestore.');
+    return false;
 }
 
 // ============================================
