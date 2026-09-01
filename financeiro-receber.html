@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BARVOX - Contas a Receber</title>
+    <link rel="stylesheet" href="style-global.css">
+    <link rel="stylesheet" href="style-modulos.css">
+</head>
+
+<body>
+    <!-- Menu Lateral -->
+    <div id="menu-container"></div>
+
+    <!-- Conteúdo Principal -->
+    <main>
+        <div class="topbar">
+            <div class="topbar-content">
+                <h1>Contas a Receber</h1>
+            </div>
+        </div>
+
+        <div class="container">
+            <!-- Busca e Filtros -->
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Buscar por cliente ou código...">
+                <select id="filterStatus">
+                    <option value="">Todos os Status</option>
+                    <option value="pending">Pendentes</option>
+                    <option value="overdue">Vencidas</option>
+                    <option value="received">Recebidas</option>
+                </select>
+                <button class="btn btn-secondary">🔍 Filtrar</button>
+            </div>
+
+            <!-- Tabela de Contas a Receber -->
+            <div class="table-section">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Cliente</th>
+                            <th>Valor</th>
+                            <th>Data de Vencimento</th>
+                            <th>Status</th>
+                            <th>Dias para Vencer</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="contasTable">
+                        <tr>
+                            <td colspan="7" class="empty-message">Nenhuma conta a receber</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal de Registrar Recebimento -->
+    <div class="modal" id="recebimentoModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Registrar Recebimento</h2>
+                <button class="modal-close" id="closeRecebimentoModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="recebimentoForm">
+                    <div class="info-box">
+                        <div class="info-row">
+                            <span class="label">Cliente:</span>
+                            <span id="recCliente">-</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Valor Total:</span>
+                            <span id="recValorTotal">R$ 0,00</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Já Recebido:</span>
+                            <span id="recValorRecebido">R$ 0,00</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Restante:</span>
+                            <span id="recValorRestante">R$ 0,00</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 20px;">
+                        <label for="recValor">Valor do Recebimento *</label>
+                        <input type="number" id="recValor" min="0" step="0.01" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="recData">Data do Recebimento *</label>
+                        <input type="date" id="recData" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="recObservacoes">Observações</label>
+                        <textarea id="recObservacoes" rows="3"></textarea>
+                    </div>
+
+                    <div class="alert alert-info" style="margin-top: 15px;">
+                        Se o valor recebido for menor que o total, será mantido como parcialmente recebido.
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" id="cancelRecBtn">Cancelar</button>
+                        <button type="submit" class="btn btn-success">Registrar Recebimento</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts como módulos ES6 -->
+    <script>
+        fetch('menu-lateral.html')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('menu-container').innerHTML = html;
+                if (typeof initializeMenu === 'function') {
+                    initializeMenu();
+                }
+            });
+    </script>
+    <script type="module" src="financeiro.js"></script>
+</body>
+
+</html>

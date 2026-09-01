@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BARVOX - Orçamento</title>
+    <link rel="stylesheet" href="style-global.css">
+    <link rel="stylesheet" href="style-modulos.css">
+</head>
+
+<body>
+    <!-- Menu Lateral -->
+    <div id="menu-container"></div>
+
+    <!-- Conteúdo Principal -->
+    <main>
+        <div class="topbar">
+            <div class="topbar-content">
+                <h1>Orçamento para Cliente</h1>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="form-section">
+                <h2>Criar Orçamento</h2>
+                
+                <form id="orcamentoForm">
+                    <!-- Dados do Cliente -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="orcCliente">Cliente *</label>
+                            <select id="orcCliente" required>
+                                <option value="">Selecionar cliente...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="orcData">Data do Orçamento *</label>
+                            <input type="date" id="orcData" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="orcValidade">Validade (dias) *</label>
+                            <input type="number" id="orcValidade" min="1" value="30" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="orcObservacoes">Observações</label>
+                            <textarea id="orcObservacoes" rows="3"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Adicionar Produtos -->
+                    <h3 style="margin-top: 20px;">Itens do Orçamento</h3>
+                    <div class="form-row">
+                        <div class="form-group" style="flex: 1;">
+                            <label for="orcProduto">Produto</label>
+                            <select id="orcProduto">
+                                <option value="">Buscar produto...</option>
+                            </select>
+                        </div>
+                        <button type="button" class="btn btn-secondary" id="btnAdicionarProduto" style="margin-top: 22px;">Adicionar</button>
+                    </div>
+
+                    <!-- Tabela de Itens -->
+                    <table class="data-table" style="margin-top: 15px; font-size: 13px;">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Produto</th>
+                                <th>Embalagem</th>
+                                <th>Quantidade</th>
+                                <th>Valor Unitário</th>
+                                <th>Desconto</th>
+                                <th>Subtotal</th>
+                                <th>Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orcItens">
+                            <tr>
+                                <td colspan="8" class="empty-message">Nenhum produto adicionado</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Resumo -->
+                    <div style="background: var(--light-color); padding: 15px; border-radius: 6px; margin-top: 15px;">
+                        <div class="form-row" style="gap: 30px;">
+                            <div>
+                                <label>Subtotal:</label>
+                                <div style="font-size: 18px; font-weight: bold; color: var(--primary-color);" id="orcSubtotal">R$ 0,00</div>
+                            </div>
+                            <div>
+                                <label>Desconto:</label>
+                                <input type="number" id="orcDesconto" min="0" step="0.01" value="0" style="width: 150px;">
+                            </div>
+                            <div>
+                                <label>Total:</label>
+                                <div style="font-size: 20px; font-weight: bold; color: var(--success-color);" id="orcTotal">R$ 0,00</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 30px; display: flex; gap: 10px;">
+                        <button type="submit" class="btn btn-primary" style="flex: 1;">💾 Salvar Orçamento</button>
+                        <button type="button" class="btn btn-secondary" id="btnGerarPDF">📄 Gerar PDF</button>
+                        <button type="button" class="btn btn-secondary" id="btnEnviarEmail">📧 Enviar por Email</button>
+                        <button type="button" class="btn btn-secondary" id="btnLimpar">🔄 Limpar</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Histórico de Orçamentos -->
+            <div style="margin-top: 50px;">
+                <h2>Orçamentos Anteriores</h2>
+                <div class="search-box">
+                    <input type="text" id="searchOrc" placeholder="Buscar por cliente ou código...">
+                    <button class="btn btn-secondary">🔍 Buscar</button>
+                </div>
+
+                <div class="table-section">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Cliente</th>
+                                <th>Data</th>
+                                <th>Valor</th>
+                                <th>Validade</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orcamentosTable">
+                            <tr>
+                                <td colspan="7" class="empty-message">Nenhum orçamento registrado</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts como módulos ES6 -->
+    <script>
+        fetch('menu-lateral.html')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('menu-container').innerHTML = html;
+                if (typeof initializeMenu === 'function') {
+                    initializeMenu();
+                }
+            });
+    </script>
+    <script type="module" src="vendas.js"></script>
+</body>
+
+</html>

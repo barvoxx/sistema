@@ -1,0 +1,447 @@
+<!-- ============================================
+     MENU LATERAL - COMPARTILHADO EM TODAS AS PÁGINAS
+     ============================================ -->
+
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <h2>BARVOX</h2>
+        <button class="toggle-sidebar" id="toggleSidebar">
+            <span class="hamburger"></span>
+        </button>
+    </div>
+
+    <nav class="sidebar-menu">
+        <!-- Dashboard -->
+        <a href="dashboard.html" class="menu-item">
+            <span class="menu-icon">📊</span>
+            <span class="menu-text">Dashboard</span>
+        </a>
+
+        <!-- Compras -->
+        <a href="compras.html" class="menu-item">
+            <span class="menu-icon">🛒</span>
+            <span class="menu-text">Compras</span>
+        </a>
+
+        <!-- Financeiro -->
+        <a href="financeiro.html" class="menu-item">
+            <span class="menu-icon">💰</span>
+            <span class="menu-text">Financeiro</span>
+        </a>
+
+        <!-- Vendas -->
+        <a href="vendas.html" class="menu-item">
+            <span class="menu-icon">📈</span>
+            <span class="menu-text">Vendas</span>
+        </a>
+
+        <!-- Relatórios -->
+        <a href="relatorios.html" class="menu-item">
+            <span class="menu-icon">📑</span>
+            <span class="menu-text">Relatórios</span>
+        </a>
+
+        <!-- Configurações -->
+        <a href="configuracoes.html" class="menu-item">
+            <span class="menu-icon">⚙️</span>
+            <span class="menu-text">Configurações</span>
+        </a>
+    </nav>
+
+    <div class="sidebar-footer">
+        <button class="btn-logout" id="logoutBtn">
+            <span class="menu-icon">🚪</span>
+            <span class="menu-text">Sair</span>
+        </button>
+    </div>
+</aside>
+
+<style>
+/* ============================================
+   MENU LATERAL - ESTILOS
+   ============================================ */
+
+:root {
+    --sidebar-width: 250px;
+    --sidebar-bg: #2d3142;
+    --sidebar-text: #e0e0e0;
+    --sidebar-hover: #3f37c9;
+    --sidebar-active: #4361ee;
+    --primary-color: #4361ee;
+}
+
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: var(--sidebar-width);
+    height: 100vh;
+    background: var(--sidebar-bg);
+    color: var(--sidebar-text);
+    overflow-y: auto;
+    transition: all 0.3s ease;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+.sidebar.collapsed {
+    width: 70px;
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: linear-gradient(135deg, #3f37c9 0%, #4361ee 100%);
+}
+
+.sidebar-header h2 {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0;
+    white-space: nowrap;
+    transition: opacity 0.3s ease;
+}
+
+.sidebar.collapsed .sidebar-header h2 {
+    opacity: 0;
+    width: 0;
+    overflow: hidden;
+}
+
+.toggle-sidebar {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 20px;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hamburger {
+    display: block;
+    width: 24px;
+    height: 2px;
+    background: white;
+    position: relative;
+}
+
+.hamburger::before,
+.hamburger::after {
+    content: '';
+    display: block;
+    width: 24px;
+    height: 2px;
+    background: white;
+    position: absolute;
+    transition: all 0.3s ease;
+}
+
+.hamburger::before {
+    top: -8px;
+}
+
+.hamburger::after {
+    bottom: -8px;
+}
+
+.sidebar-menu {
+    padding: 20px 0;
+    list-style: none;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px 20px;
+    color: var(--sidebar-text);
+    text-decoration: none;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 15px;
+    width: 100%;
+    transition: all 0.3s ease;
+    text-align: left;
+    font-family: inherit;
+}
+
+.menu-item:hover {
+    background: rgba(67, 97, 238, 0.2);
+    color: #fff;
+}
+
+.menu-item.active {
+    background: var(--sidebar-active);
+    color: white;
+    border-left: 4px solid white;
+    padding-left: calc(20px - 4px);
+}
+
+.menu-icon {
+    font-size: 18px;
+    min-width: 24px;
+    display: inline-flex;
+    justify-content: center;
+}
+
+.menu-text {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sidebar.collapsed .menu-text {
+    display: none;
+}
+
+.menu-arrow {
+    font-size: 12px;
+    transition: transform 0.3s ease;
+}
+
+.menu-arrow.open {
+    transform: rotate(180deg);
+}
+
+.sidebar.collapsed .menu-arrow {
+    display: none;
+}
+
+.menu-group {
+    margin: 5px 0;
+}
+
+.submenu {
+    display: none;
+    background: rgba(0, 0, 0, 0.2);
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.submenu.open {
+    display: block;
+    max-height: 500px;
+}
+
+.submenu-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 10px 20px 10px 50px;
+    color: var(--sidebar-text);
+    text-decoration: none;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    border-left: 3px solid transparent;
+}
+
+.submenu-item:hover {
+    background: rgba(67, 97, 238, 0.15);
+    color: #fff;
+    border-left-color: var(--sidebar-active);
+}
+
+.submenu-item.active {
+    color: var(--sidebar-active);
+    border-left-color: var(--sidebar-active);
+    background: rgba(67, 97, 238, 0.1);
+}
+
+.sidebar-footer {
+    position: absolute;
+    bottom: 20px;
+    left: 0;
+    right: 0;
+    padding: 0 10px;
+}
+
+.btn-logout {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px 10px;
+    background: rgba(239, 71, 111, 0.1);
+    border: 1px solid rgba(239, 71, 111, 0.3);
+    color: #ff6b7a;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 15px;
+    font-family: inherit;
+    transition: all 0.3s ease;
+}
+
+.btn-logout:hover {
+    background: rgba(239, 71, 111, 0.2);
+    border-color: rgba(239, 71, 111, 0.5);
+}
+
+.btn-logout .menu-text {
+    flex: 1;
+}
+
+.sidebar.collapsed .btn-logout .menu-text {
+    display: none;
+}
+
+/* ============================================
+   AJUSTE DO MAIN CONTENT COM SIDEBAR
+   ============================================ */
+
+main {
+    margin-left: var(--sidebar-width);
+    transition: margin-left 0.3s ease;
+}
+
+main.with-collapsed-sidebar {
+    margin-left: 70px;
+}
+
+/* ============================================
+   RESPONSIVO
+   ============================================ */
+
+@media (max-width: 768px) {
+    .sidebar {
+        width: 70px;
+    }
+
+    .sidebar-header h2,
+    .menu-text,
+    .menu-arrow {
+        display: none;
+    }
+
+    .sidebar-header {
+        justify-content: center;
+    }
+
+    .menu-item {
+        justify-content: center;
+        padding: 15px;
+        gap: 0;
+    }
+
+    .submenu-item {
+        display: none;
+    }
+
+    main {
+        margin-left: 70px;
+    }
+}
+</style>
+
+<script>
+// ============================================
+// MENU LATERAL - INTERATIVIDADE
+// ============================================
+
+function initializeMenu() {
+    const toggleBtn = document.getElementById('toggleSidebar');
+    const sidebar = document.getElementById('sidebar');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const menuToggles = document.querySelectorAll('.menu-toggle');
+
+    // Toggle sidebar
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            const main = document.querySelector('main');
+            if (main) {
+                main.classList.toggle('with-collapsed-sidebar');
+            }
+            localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+        });
+
+        // Restaurar estado do sidebar
+        if (localStorage.getItem('sidebarCollapsed') === 'true') {
+            sidebar.classList.add('collapsed');
+            const main = document.querySelector('main');
+            if (main) {
+                main.classList.add('with-collapsed-sidebar');
+            }
+        }
+    }
+
+    // Toggle submenus
+    menuToggles.forEach(toggle => {
+        toggle.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetId = toggle.getAttribute('data-target');
+            const submenu = document.getElementById(targetId);
+            const arrow = toggle.querySelector('.menu-arrow');
+
+            if (submenu && arrow) {
+                submenu.classList.toggle('open');
+                arrow.classList.toggle('open');
+            }
+        });
+    });
+
+    // Logout
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', async () => {
+            const result = await logoutUser();
+            if (result && result.success) {
+                window.location.href = 'index.html';
+            }
+        });
+    }
+
+    // Ativar menu item da página atual
+    const currentPage = window.location.pathname.split('/').pop() || 'dashboard.html';
+    const links = document.querySelectorAll('.sidebar a');
+    links.forEach(link => {
+        const href = link.getAttribute('href');
+        if (href && href === currentPage) {
+            link.classList.add('active');
+            
+            // Abrir submenu pai se necessário
+            const parent = link.closest('.menu-group');
+            if (parent) {
+                const toggle = parent.querySelector('.menu-toggle');
+                if (toggle) {
+                    const submenu = document.getElementById(toggle.getAttribute('data-target'));
+                    const arrow = toggle.querySelector('.menu-arrow');
+                    if (submenu && arrow) {
+                        submenu.classList.add('open');
+                        arrow.classList.add('open');
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Executar quando o DOM estiver pronto
+document.addEventListener('DOMContentLoaded', initializeMenu);
+
+// Também executar quando o menu for injetado dinamicamente
+document.addEventListener('DOMContentLoaded', () => {
+    // Observar mudanças no DOM para reinicializar o menu
+    const observer = new MutationObserver(() => {
+        const sidebar = document.getElementById('sidebar');
+        if (sidebar && !sidebar.hasAttribute('data-initialized')) {
+            sidebar.setAttribute('data-initialized', 'true');
+            initializeMenu();
+        }
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+});
+
+// Se o menu já está carregado ao executar este script
+if (document.getElementById('sidebar')) {
+    initializeMenu();
+}
+</script>

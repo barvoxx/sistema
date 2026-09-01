@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BARVOX - Cadastro de Produtos</title>
+    <link rel="stylesheet" href="style-global.css">
+    <link rel="stylesheet" href="style-modulos.css">
+</head>
+
+<body>
+    <!-- Menu Lateral -->
+    <div id="menu-container"></div>
+
+    <!-- Conteúdo Principal -->
+    <main>
+        <div class="topbar">
+            <div class="topbar-content">
+                <h1>Cadastro de Produtos</h1>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-primary" id="btnNovoProduto">+ Novo Produto</button>
+                    <button class="btn btn-secondary" id="btnImportarExcel">📥 Importar Excel</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <!-- Busca -->
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Buscar por nome ou código...">
+                <button class="btn btn-secondary">🔍 Buscar</button>
+            </div>
+
+            <!-- Tabela de Produtos -->
+            <div class="table-section">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Nome</th>
+                            <th>NCM</th>
+                            <th>Fornecedor(es)</th>
+                            <th>Estoque</th>
+                            <th>Embalagem</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="produtosTable">
+                        <tr>
+                            <td colspan="7" class="empty-message">Nenhum produto cadastrado</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal de Cadastro/Edição -->
+    <div class="modal" id="produtoModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="produtoModalTitle">Novo Produto</h2>
+                <button class="modal-close" id="closeProdutoModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="produtoForm">
+                    <div class="form-group">
+                        <label for="produtoNome">Nome do Produto *</label>
+                        <input type="text" id="produtoNome" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="produtoNCM">NCM *</label>
+                            <input type="text" id="produtoNCM" placeholder="00000000" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="produtoIPI">IPI (%)</label>
+                            <input type="number" id="produtoIPI" min="0" step="0.01">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Embalagens *</label>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+                            <div>
+                                <label style="display: flex; gap: 8px; align-items: center;">
+                                    <input type="checkbox" id="embPC" value="PC">
+                                    <span>PC</span>
+                                </label>
+                                <input type="number" id="embPCQtd" placeholder="Qtd" min="1" style="margin-top: 5px; width: 100%;">
+                            </div>
+                            <div>
+                                <label style="display: flex; gap: 8px; align-items: center;">
+                                    <input type="checkbox" id="embUN" value="UN">
+                                    <span>UN</span>
+                                </label>
+                                <input type="number" id="embUNQtd" placeholder="Qtd" min="1" style="margin-top: 5px; width: 100%;">
+                            </div>
+                            <div>
+                                <label style="display: flex; gap: 8px; align-items: center;">
+                                    <input type="checkbox" id="embCX" value="CX">
+                                    <span>CX</span>
+                                </label>
+                                <input type="number" id="embCXQtd" placeholder="Qtd" min="1" style="margin-top: 5px; width: 100%;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="produtoFornecedor">Fornecedor(es) *</label>
+                        <select id="produtoFornecedor" multiple required style="height: 100px;">
+                            <option value="">Carregando fornecedores...</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="produtoReferencia">Referência do Fabricante</label>
+                        <input type="text" id="produtoReferencia">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="produtoEstoque">Estoque Inicial *</label>
+                        <input type="number" id="produtoEstoque" min="0" required>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" id="cancelProdutoBtn">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Salvar Produto</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Input hidden para importar Excel -->
+    <input type="file" id="excelInput" accept=".xlsx,.xls,.csv" style="display: none;">
+
+    <!-- Scripts como módulos ES6 -->
+    <script>
+        fetch('menu-lateral.html')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('menu-container').innerHTML = html;
+                if (typeof initializeMenu === 'function') {
+                    initializeMenu();
+                }
+            });
+    </script>
+    <script type="module" src="compras.js"></script>
+</body>
+
+</html>

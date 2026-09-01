@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BARVOX - Compras</title>
+    <link rel="stylesheet" href="style-global.css">
+    <link rel="stylesheet" href="style-modulos.css">
+    <style>
+        .modulos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .modulo-card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: var(--box-shadow);
+            transition: all 0.3s ease;
+            border-left: 4px solid var(--primary-color);
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .modulo-card:hover {
+            box-shadow: var(--box-shadow-lg);
+            transform: translateY(-5px);
+        }
+
+        .modulo-icon {
+            font-size: 48px;
+        }
+
+        .modulo-card h3 {
+            margin: 0;
+            color: var(--dark-color);
+            font-size: 20px;
+        }
+
+        .modulo-card p {
+            margin: 0;
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        .modulo-card .btn {
+            align-self: flex-start;
+            margin-top: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Menu Lateral -->
+    <div id="menu-container"></div>
+
+    <!-- Conteúdo Principal -->
+    <main>
+        <div class="topbar">
+            <div class="topbar-content">
+                <h1>Gerenciamento de Compras</h1>
+            </div>
+        </div>
+
+        <div class="container">
+            <p style="color: var(--text-light); font-size: 16px;">Escolha uma opção para gerenciar suas compras e estoque:</p>
+
+            <div class="modulos-grid">
+                <!-- Cadastro de Clientes -->
+                <a href="cadastro-clientes.html" class="modulo-card">
+                    <div class="modulo-icon">👥</div>
+                    <h3>Cadastro de Clientes</h3>
+                    <p>Gerenciar informações de clientes, contatos e endereços.</p>
+                    <button class="btn btn-primary">Acessar →</button>
+                </a>
+
+                <!-- Cadastro de Fornecedores -->
+                <a href="cadastro-fornecedores.html" class="modulo-card">
+                    <div class="modulo-icon">🏢</div>
+                    <h3>Cadastro de Fornecedores</h3>
+                    <p>Gerenciar informações de fornecedores e contatos comerciais.</p>
+                    <button class="btn btn-primary">Acessar →</button>
+                </a>
+
+                <!-- Cadastro de Produtos -->
+                <a href="cadastro-produtos.html" class="modulo-card">
+                    <div class="modulo-icon">📦</div>
+                    <h3>Cadastro de Produtos</h3>
+                    <p>Registrar produtos, NCM, IPI, embalagens e fornecedores.</p>
+                    <button class="btn btn-primary">Acessar →</button>
+                </a>
+
+                <!-- Tabela de Custos -->
+                <a href="compras-custos.html" class="modulo-card">
+                    <div class="modulo-icon">💲</div>
+                    <h3>Tabela de Custos</h3>
+                    <p>Gerenciar e atualizar custos unitários dos produtos.</p>
+                    <button class="btn btn-primary">Acessar →</button>
+                </a>
+
+                <!-- Estoque -->
+                <a href="compras-estoque.html" class="modulo-card">
+                    <div class="modulo-icon">📊</div>
+                    <h3>Controle de Estoque</h3>
+                    <p>Acompanhar níveis de estoque e movimentações.</p>
+                    <button class="btn btn-primary">Acessar →</button>
+                </a>
+
+                <!-- Pedidos de Compra -->
+                <a href="compras-pedidos.html" class="modulo-card">
+                    <div class="modulo-icon">🛒</div>
+                    <h3>Pedidos de Compra</h3>
+                    <p>Criar e gerenciar pedidos de compra junto aos fornecedores.</p>
+                    <button class="btn btn-primary">Acessar →</button>
+                </a>
+
+                <!-- Precificação -->
+                <a href="compras-precificar.html" class="modulo-card">
+                    <div class="modulo-icon">🎯</div>
+                    <h3>Precificação de Produtos</h3>
+                    <p>Definir preços de venda e calcular margens de lucro.</p>
+                    <button class="btn btn-primary">Acessar →</button>
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts como módulos ES6 -->
+    <script>
+        fetch('menu-lateral.html')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('menu-container').innerHTML = html;
+                if (typeof initializeMenu === 'function') {
+                    initializeMenu();
+                }
+            });
+    </script>
+</body>
+
+</html>

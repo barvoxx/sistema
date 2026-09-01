@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BARVOX - Vendas</title>
+    <link rel="stylesheet" href="style-global.css">
+    <link rel="stylesheet" href="style-modulos.css">
+    <style>
+        .modulos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .modulo-card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: var(--box-shadow);
+            transition: all 0.3s ease;
+            border-left: 4px solid var(--primary-color);
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .modulo-card:hover {
+            box-shadow: var(--box-shadow-lg);
+            transform: translateY(-5px);
+        }
+
+        .modulo-icon {
+            font-size: 48px;
+        }
+
+        .modulo-card h3 {
+            margin: 0;
+            color: var(--dark-color);
+            font-size: 20px;
+        }
+
+        .modulo-card p {
+            margin: 0;
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        .modulo-card .btn {
+            align-self: flex-start;
+            margin-top: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Menu Lateral -->
+    <div id="menu-container"></div>
+
+    <!-- Conteúdo Principal -->
+    <main>
+        <div class="topbar">
+            <div class="topbar-content">
+                <h1>Gerenciamento de Vendas</h1>
+            </div>
+        </div>
+
+        <div class="container">
+            <p style="color: var(--text-light); font-size: 16px;">Escolha uma opção para gerenciar suas vendas:</p>
+
+            <div class="modulos-grid">
+                <!-- Nova Venda -->
+                <a href="vendas-nova.html" class="modulo-card">
+                    <div class="modulo-icon">📝</div>
+                    <h3>Nova Venda</h3>
+                    <p>Registrar uma nova venda com múltiplos produtos.</p>
+                    <button class="btn btn-primary">Acessar →</button>
+                </a>
+
+                <!-- Histórico de Vendas -->
+                <a href="vendas-historico.html" class="modulo-card">
+                    <div class="modulo-icon">📊</div>
+                    <h3>Histórico de Vendas</h3>
+                    <p>Visualizar todas as vendas realizadas e detalhes.</p>
+                    <button class="btn btn-primary">Acessar →</button>
+                </a>
+
+                <!-- Orçamentos -->
+                <a href="vendas-orcamento.html" class="modulo-card">
+                    <div class="modulo-icon">📄</div>
+                    <h3>Orçamentos</h3>
+                    <p>Criar e gerenciar orçamentos para clientes.</p>
+                    <button class="btn btn-primary">Acessar →</button>
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="auth.js"></script>
+    <script src="utils.js"></script>
+    <script>
+        fetch('menu-lateral.html')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('menu-container').innerHTML = html;
+                if (typeof initializeMenu === 'function') {
+                    initializeMenu();
+                }
+            });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BARVOX - Estoque</title>
+    <link rel="stylesheet" href="style-global.css">
+    <link rel="stylesheet" href="style-modulos.css">
+</head>
+
+<body>
+    <!-- Menu Lateral -->
+    <div id="menu-container"></div>
+
+    <!-- Conteúdo Principal -->
+    <main>
+        <div class="topbar">
+            <div class="topbar-content">
+                <h1>Gestão de Estoque</h1>
+            </div>
+        </div>
+
+        <div class="container">
+            <!-- Filtros -->
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Buscar por código ou nome...">
+                <button class="btn btn-secondary">🔍 Buscar</button>
+            </div>
+
+            <!-- Tabela de Estoque -->
+            <div class="table-section">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Produto</th>
+                            <th>Estoque Atual</th>
+                            <th>Embalagem</th>
+                            <th>Dias Parado</th>
+                            <th>Última Entrada</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="estoqueTable">
+                        <tr>
+                            <td colspan="8" class="empty-message">Nenhum produto no estoque</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal de Detalhes do Estoque -->
+    <div class="modal" id="estoqueModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Detalhes do Estoque</h2>
+                <button class="modal-close" id="closeEstoqueModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="info-box">
+                    <div class="info-row">
+                        <span class="label">Produto:</span>
+                        <span id="estoqueInfoProduto">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Estoque Atual:</span>
+                        <span id="estoqueInfoQuantidade">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Embalagem:</span>
+                        <span id="estoqueInfoEmbalagem">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Última Entrada:</span>
+                        <span id="estoqueInfoUltimaEntrada">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Dias Parado:</span>
+                        <span id="estoqueInfoDiasParado">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Valor Total:</span>
+                        <span id="estoqueInfoValor">-</span>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 20px;">Histórico de Movimentação</h3>
+                <table class="data-table" style="font-size: 13px;">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Tipo</th>
+                            <th>Quantidade</th>
+                            <th>Saldo</th>
+                        </tr>
+                    </thead>
+                    <tbody id="estoqueHistorico">
+                        <tr>
+                            <td colspan="4" class="empty-message">Nenhuma movimentação</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="auth.js"></script>
+    <script src="utils.js"></script>
+    <script>
+        fetch('menu-lateral.html')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('menu-container').innerHTML = html;
+                if (typeof initializeMenu === 'function') {
+                    initializeMenu();
+                }
+            });
+    </script>
+    <script src="compras.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BARVOX - Contas Recebidas</title>
+    <link rel="stylesheet" href="style-global.css">
+    <link rel="stylesheet" href="style-modulos.css">
+</head>
+
+<body>
+    <!-- Menu Lateral -->
+    <div id="menu-container"></div>
+
+    <!-- Conteúdo Principal -->
+    <main>
+        <div class="topbar">
+            <div class="topbar-content">
+                <h1>Contas Recebidas</h1>
+            </div>
+        </div>
+
+        <div class="container">
+            <!-- Busca e Filtros -->
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Buscar por cliente ou código...">
+                <button class="btn btn-secondary">🔍 Buscar</button>
+            </div>
+
+            <!-- Tabela de Contas Recebidas -->
+            <div class="table-section">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Cliente</th>
+                            <th>Valor Total</th>
+                            <th>Data de Recebimento</th>
+                            <th>Dias para Receber</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="contasTable">
+                        <tr>
+                            <td colspan="6" class="empty-message">Nenhuma conta recebida</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal de Detalhes -->
+    <div class="modal" id="detalhesModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Detalhes do Recebimento</h2>
+                <button class="modal-close" id="closeDetalhesModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="info-box">
+                    <div class="info-row">
+                        <span class="label">Cliente:</span>
+                        <span id="detCliente">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Valor Total:</span>
+                        <span id="detValor">R$ 0,00</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Data de Vencimento:</span>
+                        <span id="detVencimento">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Data de Recebimento:</span>
+                        <span id="detRecebimento">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Observações:</span>
+                        <span id="detObservacoes">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts como módulos ES6 -->
+    <script>
+        fetch('menu-lateral.html')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('menu-container').innerHTML = html;
+                if (typeof initializeMenu === 'function') {
+                    initializeMenu();
+                }
+            });
+    </script>
+    <script type="module" src="financeiro.js"></script>
+</body>
+
+</html>

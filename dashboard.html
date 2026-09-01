@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BARVOX - Dashboard</title>
+    <link rel="stylesheet" href="style-global.css">
+    <link rel="stylesheet" href="style-dashboard.css">
+</head>
+
+<body>
+    <!-- Menu Lateral -->
+    <div id="menu-container"></div>
+
+    <!-- Conteúdo Principal -->
+    <main>
+        <div class="topbar">
+            <div class="topbar-content">
+                <h1>Dashboard</h1>
+                <div class="topbar-actions">
+                    <div class="user-info">
+                        <span id="userName">Usuário</span>
+                        <small id="userEmail">email@example.com</small>
+                    </div>
+                    <div class="notifications">
+                        <button class="notification-btn">🔔</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <!-- KPIs Principais -->
+            <section class="kpis-grid">
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <h3>Receitas</h3>
+                        <span class="kpi-icon">📊</span>
+                    </div>
+                    <div class="kpi-value">R$ 0,00</div>
+                    <div class="kpi-footer">Mês atual</div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <h3>Custos</h3>
+                        <span class="kpi-icon">💸</span>
+                    </div>
+                    <div class="kpi-value">R$ 0,00</div>
+                    <div class="kpi-footer">Mês atual</div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <h3>Margem de Lucro</h3>
+                        <span class="kpi-icon">📈</span>
+                    </div>
+                    <div class="kpi-value">0%</div>
+                    <div class="kpi-footer">Mês atual</div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <h3>Fluxo de Caixa</h3>
+                        <span class="kpi-icon">💰</span>
+                    </div>
+                    <div class="kpi-value">R$ 0,00</div>
+                    <div class="kpi-footer">Saldo disponível</div>
+                </div>
+            </section>
+
+            <!-- Gráficos -->
+            <section class="charts-section">
+                <div class="chart-container">
+                    <h2>Vendas por Mês</h2>
+                    <canvas id="salesChart"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <h2>Custos vs Receitas</h2>
+                    <canvas id="costRevenueChart"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <h2>Produtos Mais Vendidos</h2>
+                    <canvas id="topProductsChart"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <h2>Status de Vendas</h2>
+                    <canvas id="salesStatusChart"></canvas>
+                </div>
+            </section>
+
+            <!-- Tabelas Rápidas -->
+            <section class="quick-tables">
+                <div class="table-section">
+                    <h2>Últimas Vendas</h2>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Cliente</th>
+                                <th>Valor</th>
+                                <th>Data</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentSalesTable">
+                            <tr>
+                                <td colspan="5" class="empty-message">Nenhuma venda registrada</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="table-section">
+                    <h2>Contas a Receber</h2>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Cliente</th>
+                                <th>Valor</th>
+                                <th>Vencimento</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="accountsReceivableTable">
+                            <tr>
+                                <td colspan="4" class="empty-message">Nenhuma conta a receber</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="table-section">
+                    <h2>Contas a Pagar</h2>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Fornecedor</th>
+                                <th>Valor</th>
+                                <th>Vencimento</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="accountsPayableTable">
+                            <tr>
+                                <td colspan="4" class="empty-message">Nenhuma conta a pagar</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="table-section">
+                    <h2>Estoque Baixo</h2>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Produto</th>
+                                <th>Estoque</th>
+                                <th>Mínimo</th>
+                                <th>Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lowStockTable">
+                            <tr>
+                                <td colspan="4" class="empty-message">Nenhum produto com estoque baixo</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Scripts como módulos ES6 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script>
+        // Carregar menu lateral
+        fetch('menu-lateral.html')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('menu-container').innerHTML = html;
+                if (typeof initializeMenu === 'function') {
+                    initializeMenu();
+                }
+            });
+    </script>
+    <script type="module" src="dashboard.js"></script>
+</body>
+
+</html>

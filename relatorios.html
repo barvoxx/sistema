@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BARVOX - Relatórios</title>
+    <link rel="stylesheet" href="style-global.css">
+    <link rel="stylesheet" href="style-modulos.css">
+</head>
+
+<body>
+    <!-- Menu Lateral -->
+    <div id="menu-container"></div>
+
+    <!-- Conteúdo Principal -->
+    <main>
+        <div class="topbar">
+            <div class="topbar-content">
+                <h1>Relatórios</h1>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="reports-grid">
+                <!-- Relatório de Vendas -->
+                <div class="report-card">
+                    <h3>📊 Vendas</h3>
+                    <p>Relatório de vendas por período, cliente e produto</p>
+                    <div style="display: flex; gap: 10px; margin-top: 15px;">
+                        <button class="btn btn-small btn-secondary" onclick="generateReport('sales', 'pdf')">PDF</button>
+                        <button class="btn btn-small btn-secondary" onclick="generateReport('sales', 'excel')">Excel</button>
+                    </div>
+                </div>
+
+                <!-- Relatório de Compras -->
+                <div class="report-card">
+                    <h3>🛒 Compras</h3>
+                    <p>Relatório de compras por período e fornecedor</p>
+                    <div style="display: flex; gap: 10px; margin-top: 15px;">
+                        <button class="btn btn-small btn-secondary" onclick="generateReport('purchases', 'pdf')">PDF</button>
+                        <button class="btn btn-small btn-secondary" onclick="generateReport('purchases', 'excel')">Excel</button>
+                    </div>
+                </div>
+
+                <!-- Relatório de Estoque -->
+                <div class="report-card">
+                    <h3>📦 Estoque</h3>
+                    <p>Relatório de estoque atual e movimentações</p>
+                    <div style="display: flex; gap: 10px; margin-top: 15px;">
+                        <button class="btn btn-small btn-secondary" onclick="generateReport('stock', 'pdf')">PDF</button>
+                        <button class="btn btn-small btn-secondary" onclick="generateReport('stock', 'excel')">Excel</button>
+                    </div>
+                </div>
+
+                <!-- Relatório Financeiro -->
+                <div class="report-card">
+                    <h3>💰 Financeiro</h3>
+                    <p>Relatório de contas a pagar e receber</p>
+                    <div style="display: flex; gap: 10px; margin-top: 15px;">
+                        <button class="btn btn-small btn-secondary" onclick="generateReport('financial', 'pdf')">PDF</button>
+                        <button class="btn btn-small btn-secondary" onclick="generateReport('financial', 'excel')">Excel</button>
+                    </div>
+                </div>
+
+                <!-- Relatório de Faturamento -->
+                <div class="report-card">
+                    <h3>📈 Faturamento</h3>
+                    <p>Relatório de receitas, custos e lucros</p>
+                    <div style="display: flex; gap: 10px; margin-top: 15px;">
+                        <button class="btn btn-small btn-secondary" onclick="generateReport('billing', 'pdf')">PDF</button>
+                        <button class="btn btn-small btn-secondary" onclick="generateReport('billing', 'excel')">Excel</button>
+                    </div>
+                </div>
+
+                <!-- Relatório de Clientes -->
+                <div class="report-card">
+                    <h3>👥 Clientes</h3>
+                    <p>Relatório de clientes e histórico de compras</p>
+                    <div style="display: flex; gap: 10px; margin-top: 15px;">
+                        <button class="btn btn-small btn-secondary" onclick="generateReport('clients', 'pdf')">PDF</button>
+                        <button class="btn btn-small btn-secondary" onclick="generateReport('clients', 'excel')">Excel</button>
+                    </div>
+                </div>
+
+                <!-- Relatório de Fornecedores -->
+                <div class="report-card">
+                    <h3>🏢 Fornecedores</h3>
+                    <p>Relatório de fornecedores e compras realizadas</p>
+                    <div style="display: flex; gap: 10px; margin-top: 15px;">
+                        <button class="btn btn-small btn-secondary" onclick="generateReport('suppliers', 'pdf')">PDF</button>
+                        <button class="btn btn-small btn-secondary" onclick="generateReport('suppliers', 'excel')">Excel</button>
+                    </div>
+                </div>
+
+                <!-- Relatório de Produtos Mais Vendidos -->
+                <div class="report-card">
+                    <h3>🎯 Produtos Best Sellers</h3>
+                    <p>Relatório dos produtos mais vendidos</p>
+                    <div style="display: flex; gap: 10px; margin-top: 15px;">
+                        <button class="btn btn-small btn-secondary" onclick="generateReport('bestsellers', 'pdf')">PDF</button>
+                        <button class="btn btn-small btn-secondary" onclick="generateReport('bestsellers', 'excel')">Excel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal de Filtros -->
+    <div class="modal" id="filtroModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="filtroTitle">Filtros do Relatório</h2>
+                <button class="modal-close" id="closeFiltroModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="filtroForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="filtroDataInicio">Data Início *</label>
+                            <input type="date" id="filtroDataInicio" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="filtroDataFim">Data Fim *</label>
+                            <input type="date" id="filtroDataFim" required>
+                        </div>
+                    </div>
+
+                    <div id="filtroAdicional"></div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" id="cancelFiltroBtn">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Gerar Relatório</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts como módulos ES6 -->
+    <script>
+        fetch('menu-lateral.html')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('menu-container').innerHTML = html;
+                if (typeof initializeMenu === 'function') {
+                    initializeMenu();
+                }
+            });
+    </script>
+    <script type="module" src="relatorios.js"></script>
+</body>
+
+</html>

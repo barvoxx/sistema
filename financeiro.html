@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BARVOX - Financeiro</title>
+    <link rel="stylesheet" href="style-global.css">
+    <link rel="stylesheet" href="style-modulos.css">
+    <style>
+        .modulos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .modulo-card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: var(--box-shadow);
+            transition: all 0.3s ease;
+            border-left: 4px solid var(--primary-color);
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .modulo-card:hover {
+            box-shadow: var(--box-shadow-lg);
+            transform: translateY(-5px);
+        }
+
+        .modulo-icon {
+            font-size: 48px;
+        }
+
+        .modulo-card h3 {
+            margin: 0;
+            color: var(--dark-color);
+            font-size: 20px;
+        }
+
+        .modulo-card p {
+            margin: 0;
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        .modulo-card .btn {
+            align-self: flex-start;
+            margin-top: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Menu Lateral -->
+    <div id="menu-container"></div>
+
+    <!-- Conteúdo Principal -->
+    <main>
+        <div class="topbar">
+            <div class="topbar-content">
+                <h1>Gerenciamento Financeiro</h1>
+            </div>
+        </div>
+
+        <div class="container">
+            <p style="color: var(--text-light); font-size: 16px;">Escolha uma opção para gerenciar suas contas e fluxo de caixa:</p>
+
+            <div class="modulos-grid">
+                <!-- Contas a Pagar -->
+                <a href="financeiro-pagar.html" class="modulo-card">
+                    <div class="modulo-icon">📤</div>
+                    <h3>Contas a Pagar</h3>
+                    <p>Gerenciar pagamentos pendentes e registrar pagamentos realizados.</p>
+                    <button class="btn btn-primary">Acessar →</button>
+                </a>
+
+                <!-- Contas Pagas -->
+                <a href="financeiro-pagas.html" class="modulo-card">
+                    <div class="modulo-icon">✅</div>
+                    <h3>Contas Pagas</h3>
+                    <p>Visualizar histórico de pagamentos realizados.</p>
+                    <button class="btn btn-primary">Acessar →</button>
+                </a>
+
+                <!-- Contas a Receber -->
+                <a href="financeiro-receber.html" class="modulo-card">
+                    <div class="modulo-icon">📥</div>
+                    <h3>Contas a Receber</h3>
+                    <p>Gerenciar recebimentos pendentes e registrar recebimentos.</p>
+                    <button class="btn btn-primary">Acessar →</button>
+                </a>
+
+                <!-- Contas Recebidas -->
+                <a href="financeiro-recebidas.html" class="modulo-card">
+                    <div class="modulo-icon">💰</div>
+                    <h3>Contas Recebidas</h3>
+                    <p>Visualizar histórico de recebimentos realizados.</p>
+                    <button class="btn btn-primary">Acessar →</button>
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts como módulos ES6 -->
+    <script>
+        fetch('menu-lateral.html')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('menu-container').innerHTML = html;
+                if (typeof initializeMenu === 'function') {
+                    initializeMenu();
+                }
+            });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BARVOX - Login</title>
+    <link rel="stylesheet" href="style-login.css">
+</head>
+
+<body>
+    <div class="login-container">
+        <div class="login-box">
+            <div class="logo">
+                <h1>BARVOX</h1>
+                <p>Sistema de Gestão Empresarial</p>
+            </div>
+
+            <!-- Abas de Login/Cadastro -->
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="login">Entrar</button>
+                <button class="tab-btn" data-tab="register">Cadastrar</button>
+            </div>
+
+            <!-- TAB 1: LOGIN -->
+            <div id="login" class="tab-content active">
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="loginUsername">Usuário</label>
+                        <input type="text" id="loginUsername" name="username" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="loginPassword">Senha</label>
+                        <input type="password" id="loginPassword" name="password" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Entrar</button>
+                </form>
+
+                <div class="form-footer">
+                    <a href="#forgot-password">Esqueceu a senha?</a>
+                </div>
+            </div>
+
+            <!-- TAB 2: CADASTRO -->
+            <div id="register" class="tab-content">
+                <form id="registerForm">
+                    <div class="form-group">
+                        <label for="regUsername">Nome de Usuário</label>
+                        <input type="text" id="regUsername" name="username" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="regEmail">Email</label>
+                        <input type="email" id="regEmail" name="email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="regPassword">Senha</label>
+                        <input type="password" id="regPassword" name="password" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="regPassword2">Confirmar Senha</label>
+                        <input type="password" id="regPassword2" name="password2" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="regPhone">Número de Telefone</label>
+                        <input type="tel" id="regPhone" name="phone" placeholder="(11) 99999-9999" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Criar Conta</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Mensagem de Erro/Sucesso -->
+        <div id="message" class="message"></div>
+    </div>
+
+    <!-- Scripts como módulos ES6 -->
+    <script type="module" src="login.js"></script>
+</body>
+
+</html>

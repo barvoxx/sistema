@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BARVOX - Histórico de Vendas</title>
+    <link rel="stylesheet" href="style-global.css">
+    <link rel="stylesheet" href="style-modulos.css">
+</head>
+
+<body>
+    <!-- Menu Lateral -->
+    <div id="menu-container"></div>
+
+    <!-- Conteúdo Principal -->
+    <main>
+        <div class="topbar">
+            <div class="topbar-content">
+                <h1>Histórico de Vendas</h1>
+            </div>
+        </div>
+
+        <div class="container">
+            <!-- Busca e Filtros -->
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Buscar por cliente ou código...">
+                <select id="filterStatus">
+                    <option value="">Todos os Status</option>
+                    <option value="pending">Pendentes</option>
+                    <option value="paid">Pagas</option>
+                    <option value="cancelled">Canceladas</option>
+                </select>
+                <button class="btn btn-secondary">🔍 Filtrar</button>
+            </div>
+
+            <!-- Tabela de Vendas -->
+            <div class="table-section">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Código da Venda</th>
+                            <th>Cliente</th>
+                            <th>Valor Total</th>
+                            <th>Data</th>
+                            <th>Forma de Pagamento</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="vendasTable">
+                        <tr>
+                            <td colspan="7" class="empty-message">Nenhuma venda registrada</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal de Detalhes da Venda -->
+    <div class="modal" id="vendaModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Detalhes da Venda</h2>
+                <button class="modal-close" id="closeVendaModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="info-box">
+                    <div class="info-row">
+                        <span class="label">Código:</span>
+                        <span id="detCodigo">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Cliente:</span>
+                        <span id="detCliente">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Data:</span>
+                        <span id="detData">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Valor Total:</span>
+                        <span id="detValor">R$ 0,00</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Forma de Pagamento:</span>
+                        <span id="detPagamento">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Status:</span>
+                        <span id="detStatus">-</span>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 20px;">Produtos Vendidos</h3>
+                <table class="data-table" style="font-size: 13px;">
+                    <thead>
+                        <tr>
+                            <th>Produto</th>
+                            <th>Quantidade</th>
+                            <th>Valor Unitário</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody id="detProdutos">
+                        <tr>
+                            <td colspan="4" class="empty-message">Nenhum produto</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div style="margin-top: 15px; display: flex; gap: 10px;">
+                    <button type="button" class="btn btn-secondary" id="btnImprimir">🖨️ Imprimir Nota</button>
+                    <button type="button" class="btn btn-secondary" id="btnBaixarPDF">📥 Baixar PDF</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts como módulos ES6 -->
+    <script>
+        fetch('menu-lateral.html')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('menu-container').innerHTML = html;
+                if (typeof initializeMenu === 'function') {
+                    initializeMenu();
+                }
+            });
+    </script>
+    <script type="module" src="vendas.js"></script>
+</body>
+
+</html>

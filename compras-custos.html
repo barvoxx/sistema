@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BARVOX - Tabela de Custos</title>
+    <link rel="stylesheet" href="style-global.css">
+    <link rel="stylesheet" href="style-modulos.css">
+</head>
+
+<body>
+    <!-- Menu Lateral -->
+    <div id="menu-container"></div>
+
+    <!-- Conteúdo Principal -->
+    <main>
+        <div class="topbar">
+            <div class="topbar-content">
+                <h1>Tabela de Custos</h1>
+            </div>
+        </div>
+
+        <div class="container">
+            <!-- Busca -->
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Buscar por código ou nome...">
+                <button class="btn btn-secondary">🔍 Buscar</button>
+            </div>
+
+            <!-- Tabela de Custos -->
+            <div class="table-section">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Nome do Produto</th>
+                            <th>Embalagem</th>
+                            <th>Valor de Custo</th>
+                            <th>Última Compra</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="custosTable">
+                        <tr>
+                            <td colspan="6" class="empty-message">Nenhum produto para atualizar custo</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal de Edição de Custo -->
+    <div class="modal" id="custoModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Atualizar Custo</h2>
+                <button class="modal-close" id="closeCustoModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="custoForm">
+                    <div class="form-group">
+                        <label for="custoProductName">Produto</label>
+                        <input type="text" id="custoProductName" disabled>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="custoEmbalagem">Embalagem</label>
+                            <select id="custoEmbalagem" disabled>
+                                <option>Carregando...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="custoCusto">Valor de Custo *</label>
+                            <input type="number" id="custoCusto" min="0" step="0.01" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="custoObservacoes">Observações</label>
+                        <textarea id="custoObservacoes" rows="4"></textarea>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" id="cancelCustoBtn">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Salvar Custo</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="auth.js"></script>
+    <script src="utils.js"></script>
+    <script>
+        fetch('menu-lateral.html')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('menu-container').innerHTML = html;
+                if (typeof initializeMenu === 'function') {
+                    initializeMenu();
+                }
+            });
+    </script>
+    <script src="compras.js"></script>
+</body>
+
+</html>
