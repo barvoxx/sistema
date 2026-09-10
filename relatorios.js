@@ -3,7 +3,7 @@
  * Handles report generation and export
  */
 
-import { db, auth, collection, getDocs, query, where } from './firebase-config.js';
+import { db, auth, waitForAuthenticatedUser, collection, getDocs, query, where } from './firebase-config.js';
 import { formatCurrency, formatDate, exportToCSV } from './utils.js';
 
 let currentReportType = '';
@@ -522,7 +522,10 @@ function exportToPDF(reportData) {
 // INITIALIZATION
 // ============================================
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    const user = await waitForAuthenticatedUser();
+    if (!user) return;
+
     const filtroForm = document.getElementById('filtroForm');
     if (filtroForm) {
         filtroForm.addEventListener('submit', async (e) => {
@@ -589,6 +592,8 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('filtroModal').style.display = 'none';
     });
 });
+
+window.generateReport = generateReport;
 
 // Placeholder for bestsellers report
 async function generateBestsellersReport(startDate, endDate) {

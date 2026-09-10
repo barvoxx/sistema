@@ -63,6 +63,17 @@ function getUserEmail() {
     return user ? user.email : null;
 }
 
+function waitForAuthenticatedUser() {
+    if (auth.currentUser) return Promise.resolve(auth.currentUser);
+
+    return new Promise((resolve) => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            unsubscribe();
+            resolve(user);
+        });
+    });
+}
+
 // Exportar para uso em outros módulos
 export { 
     auth, 
@@ -71,6 +82,7 @@ export {
     isUserAuthenticated, 
     getUserUID, 
     getUserEmail,
+    waitForAuthenticatedUser,
     collection,
     doc,
     getDoc,

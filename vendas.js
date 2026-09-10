@@ -3,7 +3,7 @@
  * Handles sales, sales history, and quotations
  */
 
-import { db, auth, collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, addDoc, query, where, orderBy } from './firebase-config.js';
+import { db, auth, waitForAuthenticatedUser, collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, addDoc, query, where, orderBy } from './firebase-config.js';
 import { formatCurrency, formatDate, showToast, generateCode } from './utils.js';
 
 let vendaItensTemp = [];
@@ -347,6 +347,33 @@ async function loadOrcClientes() {
     }
 }
 
+async function openVendaDetalhes(vendaId) {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const vendaDoc = await getDoc(doc(db, 'users', user.uid, 'sales', vendaId));
+    if (!vendaDoc.exists()) return;
+
+    const venda = vendaDoc.data();
+    document.getElementById('detCodigo').textContent = venda.codigo || '-';
+    document.getElementById('detCliente').textContent = venda.client_name || '-';
+    document.getElementById('detData').textContent = formatDate(venda.data);
+    document.getElementById('detValor').textContent = formatCurrency(venda.total || 0);
+    document.getElementById('detPagamento').textContent = venda.payment_method || '-';
+    document.getElementById('detStatus').textContent = venda.status || '-';
+
+    const produtos = document.getElementById('detProdutos');
+    produtos.innerHTML = (venda.items || []).map(item => `
+        <tr>
+            <td>${item.nome || '-'}</td>
+            <td>${item.quantidade || 0}</td>
+            <td>${formatCurrency(item.preco || 0)}</td>
+            <td>${formatCurrency((item.preco || 0) * (item.quantidade || 0))}</td>
+        </tr>
+    `).join('') || '<tr><td colspan="4" class="empty-message">Nenhum produto</td></tr>';
+    document.getElementById('vendaModal').style.display = 'flex';
+}
+
 async function loadOrcProdutos() {
     const user = auth.currentUser;
     if (!user) return;
@@ -600,11 +627,44 @@ async function loadOrcamentos() {
     }
 }
 
+async function openOrcDetalhes(orcamentoId) {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const orcamentoDoc = await getDoc(doc(db, 'users', user.uid, 'quotations', orcamentoId));
+    if (!orcamentoDoc.exists()) return;
+
+    const orcamento = orcamentoDoc.data();
+    const itens = (orcamento.items || []).map(item =>
+        `${item.nome || 'Produto'} x${item.quantidade || 0} = ${formatCurrency((item.preco || 0) * (item.quantidade || 0) - (item.desconto || 0) )}`
+    ).join('\n');
+    alert(`Orçamento ${orcamento.codigo || ''}\nCliente: ${orcamento.client_name || '-'}\nTotal: ${formatCurrency(orcamento.total || 0)}\nStatus: ${orcamento.status || '-'}\n\n${itens}`);
+}
+
+async function deletarOrcamento(orcamentoId) {
+    if (!confirm('Deseja excluir este orçamento?')) return;
+
+    const user = auth.currentUser;
+    if (!user) return;
+
+    try {
+        await deleteDoc(doc(db, 'users', user.uid, 'quotations', orcamentoId));
+        showToast('Orçamento excluído com sucesso', 'success');
+        loadOrcamentos();
+    } catch (error) {
+        console.error('Erro ao excluir orçamento:', error);
+        showToast('Erro ao excluir orçamento: ' + error.message, 'error');
+    }
+}
+
 // ============================================
 // INITIALIZATION
 // ============================================
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    const user = await waitForAuthenticatedUser();
+    if (!user) return;
+
     const currentPage = window.location.pathname.split('/').pop();
 
     if (currentPage.includes('vendas-nova')) {
@@ -656,4 +716,16 @@ document.addEventListener('DOMContentLoaded', () => {
             if (modal) modal.style.display = 'none';
         });
     });
+});
+
+Object.assign(window, {
+    adicionarProdutoVenda,
+    removerProdutoVenda,
+    updateProdutoVenda,
+    openVendaDetalhes,
+    adicionarProdutoOrcamento,
+    removerProdutoOrcamento,
+    updateProdutoOrcamento,
+    openOrcDetalhes,
+    deletarOrcamento
 });

@@ -3,7 +3,7 @@
  * Handles clients, suppliers, products, costs, stock, orders, and pricing
  */
 
-import { db, auth, collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, addDoc, query, where, orderBy } from './firebase-config.js';
+import { db, auth, waitForAuthenticatedUser, collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, addDoc, query, where, orderBy } from './firebase-config.js';
 import { formatCPFCNPJ, showToast, generateCode } from './utils.js';
 
 // ============================================
@@ -124,7 +124,7 @@ function processarCSV(texto) {
 let clienteEmEdicaoId = null;
 
 async function loadClientes() {
-    const user = auth.currentUser;
+    const user = await waitForAuthenticatedUser();
     if (!user) return;
 
     try {
@@ -270,7 +270,7 @@ async function deletarCliente(clienteId) {
 let fornecedorEmEdicaoId = null;
 
 async function loadFornecedores() {
-    const user = auth.currentUser;
+    const user = await waitForAuthenticatedUser();
     if (!user) return;
 
     try {
@@ -415,7 +415,7 @@ async function deletarFornecedor(fornecedorId) {
 // ============================================
 
 async function loadCustos() {
-    const user = auth.currentUser;
+    const user = await waitForAuthenticatedUser();
     if (!user) return;
 
     try {
@@ -485,7 +485,7 @@ async function salvarCusto(event) {
 }
 
 async function loadPrecificacao() {
-    const user = auth.currentUser;
+    const user = await waitForAuthenticatedUser();
     if (!user) return;
 
     try {
@@ -696,7 +696,7 @@ async function salvarPedido(event) {
 let produtoEmEdicaoId = null;
 
 async function loadProdutos() {
-    const user = auth.currentUser;
+    const user = await waitForAuthenticatedUser();
     if (!user) return;
 
     try {
@@ -883,6 +883,17 @@ async function deletarProduto(produtoId) {
 // ============================================
 // INITIALIZATION
 // ============================================
+
+Object.assign(window, {
+    openClienteModal,
+    deletarCliente,
+    openFornecedorModal,
+    deletarFornecedor,
+    openProdutoModal,
+    deletarProduto,
+    openCustoModal,
+    openPrecificacaoModal
+});
 
 document.addEventListener('DOMContentLoaded', () => {
     const currentPage = window.location.pathname.split('/').pop();

@@ -3,7 +3,7 @@
  * Handles accounts payable, receivable, and payment management
  */
 
-import { db, auth, collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, addDoc, query, where, orderBy } from './firebase-config.js';
+import { db, auth, waitForAuthenticatedUser, collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, addDoc, query, where, orderBy } from './firebase-config.js';
 import { getUserData } from './auth.js';
 import { formatCurrency, formatDate, showToast, generateCode } from './utils.js';
 
@@ -154,6 +154,25 @@ async function cancelarPagamento(contaId) {
     } catch (error) {
         console.error('Erro ao cancelar conta:', error);
         showToast('Erro ao cancelar conta', 'error');
+    }
+}
+
+async function deletarConta(contaId) {
+    if (!confirm('Deseja cancelar esta conta a pagar?')) return;
+
+    const user = auth.currentUser;
+    if (!user) return;
+
+    try {
+        await updateDoc(doc(db, 'users', user.uid, 'accounts_payable', contaId), {
+            status: 'cancelled',
+            updated_at: new Date().toISOString()
+        });
+        showToast('Conta cancelada com sucesso', 'success');
+        loadAccountsPayable();
+    } catch (error) {
+        console.error('Erro ao cancelar conta:', error);
+        showToast('Erro ao cancelar conta: ' + error.message, 'error');
     }
 }
 
@@ -460,7 +479,10 @@ async function openDetalhesRecebidas(contaId) {
 // MODAL CLOSE HANDLERS
 // ============================================
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    const user = await waitForAuthenticatedUser();
+    if (!user) return;
+
     const closeBtns = document.querySelectorAll('[id*="close"]');
     closeBtns.forEach(btn => {
         btn.addEventListener('click', (e) => {
@@ -498,6 +520,15 @@ document.addEventListener('DOMContentLoaded', () => {
         searchInput.addEventListener('input', filterData);
         filterStatus.addEventListener('change', filterData);
     }
+});
+
+Object.assign(window, {
+    openPagamentoModal,
+    deletarConta,
+    openDetalhesPagas,
+    openRecebimentoModal,
+    cancelarRecebimento,
+    openDetalhesRecebidas
 });
 
 // ============================================

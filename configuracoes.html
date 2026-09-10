@@ -144,13 +144,13 @@
             });
     </script>
     <script type="module">
-        import { auth, db, doc, deleteDoc, updateDoc } from './firebase-config.js';
+        import { auth, db, waitForAuthenticatedUser, doc, deleteDoc, updateDoc } from './firebase-config.js';
         import { getUserData, updateUserData } from './auth.js';
         import { showToast } from './utils.js';
 
         // Carregar dados do perfil
         async function loadPerfilData() {
-            const user = auth.currentUser;
+            const user = await waitForAuthenticatedUser();
             if (!user) return;
 
             try {
