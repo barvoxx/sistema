@@ -3,11 +3,15 @@
  * Handles report generation and export
  */
 
-import { db, auth } from './firebase-config.js';
+import { db, auth, collection, getDocs, query, where } from './firebase-config.js';
 import { formatCurrency, formatDate, exportToCSV } from './utils.js';
 
 let currentReportType = '';
 let currentReportFormat = '';
+
+function userCollection(user, name) {
+    return collection(db, 'users', user.uid, name);
+}
 
 // ============================================
 // REPORT GENERATION
@@ -72,12 +76,11 @@ async function generateSalesReport(startDate, endDate, filters = {}) {
     if (!user) return null;
 
     try {
-        const snapshot = await db.collection('users')
-            .doc(user.uid)
-            .collection('sales')
-            .where('data', '>=', startDate)
-            .where('data', '<=', endDate)
-            .get();
+        const snapshot = await getDocs(query(
+            userCollection(user, 'sales'),
+            where('data', '>=', startDate),
+            where('data', '<=', endDate)
+        ));
 
         let vendas = [];
         snapshot.forEach(doc => {
@@ -113,12 +116,11 @@ async function generatePurchasesReport(startDate, endDate, filters = {}) {
     if (!user) return null;
 
     try {
-        const snapshot = await db.collection('users')
-            .doc(user.uid)
-            .collection('purchase_orders')
-            .where('data_compra', '>=', startDate)
-            .where('data_compra', '<=', endDate)
-            .get();
+        const snapshot = await getDocs(query(
+            userCollection(user, 'purchases'),
+            where('purchase_date', '>=', startDate),
+            where('purchase_date', '<=', endDate)
+        ));
 
         let compras = [];
         snapshot.forEach(doc => {
@@ -154,10 +156,7 @@ async function generateStockReport(startDate, endDate) {
     if (!user) return null;
 
     try {
-        const snapshot = await db.collection('users')
-            .doc(user.uid)
-            .collection('products')
-            .get();
+        const snapshot = await getDocs(userCollection(user, 'products'));
 
         let produtos = [];
         snapshot.forEach(doc => {
@@ -198,10 +197,7 @@ async function generateFinancialReport(startDate, endDate, type = '') {
         let contas = [];
 
         if (type !== 'receivable') {
-            const payableSnapshot = await db.collection('users')
-                .doc(user.uid)
-                .collection('accounts_payable')
-                .get();
+            const payableSnapshot = await getDocs(userCollection(user, 'accounts_payable'));
 
             payableSnapshot.forEach(doc => {
                 const conta = doc.data();
@@ -217,10 +213,7 @@ async function generateFinancialReport(startDate, endDate, type = '') {
         }
 
         if (type !== 'payable') {
-            const receivableSnapshot = await db.collection('users')
-                .doc(user.uid)
-                .collection('accounts_receivable')
-                .get();
+            const receivableSnapshot = await getDocs(userCollection(user, 'accounts_receivable'));
 
             receivableSnapshot.forEach(doc => {
                 const conta = doc.data();
@@ -268,19 +261,17 @@ async function generateBillingReport(startDate, endDate) {
     if (!user) return null;
 
     try {
-        const vendas = await db.collection('users')
-            .doc(user.uid)
-            .collection('sales')
-            .where('data', '>=', startDate)
-            .where('data', '<=', endDate)
-            .get();
+        const vendas = await getDocs(query(
+            userCollection(user, 'sales'),
+            where('data', '>=', startDate),
+            where('data', '<=', endDate)
+        ));
 
-        const compras = await db.collection('users')
-            .doc(user.uid)
-            .collection('purchase_orders')
-            .where('data_compra', '>=', startDate)
-            .where('data_compra', '<=', endDate)
-            .get();
+        const compras = await getDocs(query(
+            userCollection(user, 'purchases'),
+            where('purchase_date', '>=', startDate),
+            where('purchase_date', '<=', endDate)
+        ));
 
         let totalRecebido = 0;
         let totalCustos = 0;
@@ -326,10 +317,7 @@ async function generateClientsReport() {
     if (!user) return null;
 
     try {
-        const clientesSnapshot = await db.collection('users')
-            .doc(user.uid)
-            .collection('clients')
-            .get();
+        const clientesSnapshot = await getDocs(userCollection(user, 'clients'));
 
         let clientes = [];
 
@@ -337,11 +325,10 @@ async function generateClientsReport() {
             const cliente = doc.data();
             
             // Contar vendas e somar valores
-            const vendas = await db.collection('users')
-                .doc(user.uid)
-                .collection('sales')
-                .where('client_id', '==', doc.id)
-                .get();
+            const vendas = await getDocs(query(
+                userCollection(user, 'sales'),
+                where('client_id', '==', doc.id)
+            ));
 
             let totalVendas = 0;
             vendas.forEach(v => {
@@ -382,10 +369,7 @@ async function generateSuppliersReport() {
     if (!user) return null;
 
     try {
-        const fornecedoresSnapshot = await db.collection('users')
-            .doc(user.uid)
-            .collection('suppliers')
-            .get();
+        const fornecedoresSnapshot = await getDocs(userCollection(user, 'suppliers'));
 
         let fornecedores = [];
 
@@ -393,11 +377,10 @@ async function generateSuppliersReport() {
             const fornecedor = doc.data();
             
             // Contar compras e somar valores
-            const compras = await db.collection('users')
-                .doc(user.uid)
-                .collection('purchase_orders')
-                .where('supplier_id', '==', doc.id)
-                .get();
+            const compras = await getDocs(query(
+                userCollection(user, 'purchases'),
+                where('supplier_id', '==', doc.id)
+            ));
 
             let totalCompras = 0;
             compras.forEach(c => {
@@ -613,12 +596,11 @@ async function generateBestsellersReport(startDate, endDate) {
     if (!user) return null;
 
     try {
-        const vendas = await db.collection('users')
-            .doc(user.uid)
-            .collection('sales')
-            .where('data', '>=', startDate)
-            .where('data', '<=', endDate)
-            .get();
+        const vendas = await getDocs(query(
+            userCollection(user, 'sales'),
+            where('data', '>=', startDate),
+            where('data', '<=', endDate)
+        ));
 
         let produtosVendidos = {};
 

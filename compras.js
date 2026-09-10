@@ -121,6 +121,8 @@ function processarCSV(texto) {
 // CADASTRO DE CLIENTES - CADASTRO-CLIENTES.HTML
 // ============================================
 
+let clienteEmEdicaoId = null;
+
 async function loadClientes() {
     const user = auth.currentUser;
     if (!user) return;
@@ -178,6 +180,7 @@ async function openClienteModal(clienteId = null, edit = false) {
 
     // Limpar formulário
     form.reset();
+    clienteEmEdicaoId = edit && clienteId ? clienteId : null;
 
     if (edit && clienteId) {
         const user = auth.currentUser;
@@ -197,17 +200,9 @@ async function openClienteModal(clienteId = null, edit = false) {
 
             document.getElementById('clienteModalTitle').textContent = 'Editar Cliente';
 
-            form.onsubmit = async (e) => {
-                e.preventDefault();
-                await salvarCliente(clienteId);
-            };
         }
     } else {
         document.getElementById('clienteModalTitle').textContent = 'Novo Cliente';
-        form.onsubmit = async (e) => {
-            e.preventDefault();
-            await salvarCliente();
-        };
     }
 
     modal.style.display = 'flex';
@@ -272,6 +267,8 @@ async function deletarCliente(clienteId) {
 // CADASTRO DE FORNECEDORES - CADASTRO-FORNECEDORES.HTML
 // ============================================
 
+let fornecedorEmEdicaoId = null;
+
 async function loadFornecedores() {
     const user = auth.currentUser;
     if (!user) return;
@@ -329,6 +326,7 @@ async function openFornecedorModal(fornecedorId = null, edit = false) {
 
     // Limpar formulário
     form.reset();
+    fornecedorEmEdicaoId = edit && fornecedorId ? fornecedorId : null;
 
     if (edit && fornecedorId) {
         const user = auth.currentUser;
@@ -349,17 +347,9 @@ async function openFornecedorModal(fornecedorId = null, edit = false) {
 
             document.getElementById('fornecedorModalTitle').textContent = 'Editar Fornecedor';
 
-            form.onsubmit = async (e) => {
-                e.preventDefault();
-                await salvarFornecedor(fornecedorId);
-            };
         }
     } else {
         document.getElementById('fornecedorModalTitle').textContent = 'Novo Fornecedor';
-        form.onsubmit = async (e) => {
-            e.preventDefault();
-            await salvarFornecedor();
-        };
     }
 
     modal.style.display = 'flex';
@@ -421,8 +411,289 @@ async function deletarFornecedor(fornecedorId) {
 }
 
 // ============================================
+// CUSTOS E PRECIFICACAO
+// ============================================
+
+async function loadCustos() {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    try {
+        const snapshot = await getDocs(query(collection(db, 'users', user.uid, 'products'), orderBy('name')));
+        const tbody = document.getElementById('custosTable');
+        if (!tbody) return;
+
+        tbody.innerHTML = '';
+        snapshot.forEach(productDoc => {
+            const produto = productDoc.data();
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${produto.codigo || '-'}</td>
+                <td>${produto.name || '-'}</td>
+                <td>${produto.packaging || 'UN'}</td>
+                <td>R$ ${(produto.cost_price || 0).toFixed(2)}</td>
+                <td>${produto.last_cost_update || '-'}</td>
+                <td><button type="button" class="action-btn edit" data-custo-id="${productDoc.id}">Editar</button></td>
+            `;
+            row.querySelector('[data-custo-id]').addEventListener('click', () => openCustoModal(productDoc.id));
+            tbody.appendChild(row);
+        });
+    } catch (error) {
+        console.error('Erro ao carregar custos:', error);
+        showToast('Erro ao carregar custos', 'error');
+    }
+}
+
+async function openCustoModal(produtoId) {
+    const user = auth.currentUser;
+    if (!user) {
+        showToast('Faça login para atualizar custos', 'error');
+        return;
+    }
+
+    const produtoDoc = await getDoc(doc(db, 'users', user.uid, 'products', produtoId));
+    if (!produtoDoc.exists()) return;
+
+    const produto = produtoDoc.data();
+    document.getElementById('custoProductName').value = produto.name || '';
+    document.getElementById('custoCusto').value = produto.cost_price || '';
+    document.getElementById('custoObservacoes').value = produto.cost_notes || '';
+    document.getElementById('custoForm').dataset.produtoId = produtoId;
+    document.getElementById('custoModal').style.display = 'flex';
+}
+
+async function salvarCusto(event) {
+    event.preventDefault();
+    const user = auth.currentUser;
+    const form = document.getElementById('custoForm');
+    const custo = parseFloat(document.getElementById('custoCusto').value);
+    if (!user || !form.dataset.produtoId || Number.isNaN(custo)) return;
+
+    try {
+        await updateDoc(doc(db, 'users', user.uid, 'products', form.dataset.produtoId), {
+            cost_price: custo,
+            cost_notes: document.getElementById('custoObservacoes').value,
+            last_cost_update: new Date().toISOString().split('T')[0]
+        });
+        showToast('Custo salvo com sucesso', 'success');
+        document.getElementById('custoModal').style.display = 'none';
+        loadCustos();
+    } catch (error) {
+        console.error('Erro ao salvar custo:', error);
+        showToast('Erro ao salvar custo: ' + error.message, 'error');
+    }
+}
+
+async function loadPrecificacao() {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    try {
+        const snapshot = await getDocs(query(collection(db, 'users', user.uid, 'products'), orderBy('name')));
+        const tbody = document.getElementById('precificacaoTable');
+        if (!tbody) return;
+
+        tbody.innerHTML = '';
+        snapshot.forEach(productDoc => {
+            const produto = productDoc.data();
+            const custo = produto.cost_price || 0;
+            const preco = produto.sale_price || 0;
+            const margem = preco ? ((preco - custo) / preco) * 100 : 0;
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${produto.codigo || '-'}</td>
+                <td>${produto.name || '-'}</td>
+                <td>R$ ${custo.toFixed(2)}</td>
+                <td>R$ ${preco.toFixed(2)}</td>
+                <td>${margem.toFixed(2)}%</td>
+                <td><button type="button" class="action-btn edit" data-preco-id="${productDoc.id}">Editar</button></td>
+            `;
+            row.querySelector('[data-preco-id]').addEventListener('click', () => openPrecificacaoModal(productDoc.id));
+            tbody.appendChild(row);
+        });
+    } catch (error) {
+        console.error('Erro ao carregar precificacao:', error);
+        showToast('Erro ao carregar precificacao', 'error');
+    }
+}
+
+async function openPrecificacaoModal(produtoId) {
+    const user = auth.currentUser;
+    if (!user) {
+        showToast('Faça login para atualizar precos', 'error');
+        return;
+    }
+
+    const produtoDoc = await getDoc(doc(db, 'users', user.uid, 'products', produtoId));
+    if (!produtoDoc.exists()) return;
+
+    const produto = produtoDoc.data();
+    document.getElementById('precProduto').value = produto.name || '';
+    document.getElementById('precCusto').value = produto.cost_price || 0;
+    document.getElementById('precPreco').value = produto.sale_price || '';
+    document.getElementById('precificacaoForm').dataset.produtoId = produtoId;
+    document.getElementById('precificacaoModal').style.display = 'flex';
+}
+
+async function salvarPrecificacao(event) {
+    event.preventDefault();
+    const user = auth.currentUser;
+    const form = document.getElementById('precificacaoForm');
+    const preco = parseFloat(document.getElementById('precPreco').value);
+    if (!user || !form.dataset.produtoId || Number.isNaN(preco)) return;
+
+    try {
+        await updateDoc(doc(db, 'users', user.uid, 'products', form.dataset.produtoId), {
+            sale_price: preco,
+            updated_at: new Date().toISOString()
+        });
+        showToast('Preco salvo com sucesso', 'success');
+        document.getElementById('precificacaoModal').style.display = 'none';
+        loadPrecificacao();
+    } catch (error) {
+        console.error('Erro ao salvar preco:', error);
+        showToast('Erro ao salvar preco: ' + error.message, 'error');
+    }
+}
+
+let pedidoItensTemp = [];
+
+async function carregarOpcoesPedido() {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const fornecedores = await getDocs(query(collection(db, 'users', user.uid, 'suppliers'), orderBy('name')));
+    const fornecedorSelect = document.getElementById('pedidoFornecedor');
+    fornecedorSelect.innerHTML = '<option value="">Selecionar fornecedor...</option>';
+    fornecedores.forEach(fornecedorDoc => {
+        const option = document.createElement('option');
+        option.value = fornecedorDoc.id;
+        option.textContent = fornecedorDoc.data().name;
+        fornecedorSelect.appendChild(option);
+    });
+
+    const produtos = await getDocs(query(collection(db, 'users', user.uid, 'products'), orderBy('name')));
+    const produtoSelect = document.getElementById('pedidoProduto');
+    produtoSelect.innerHTML = '<option value="">Buscar produto...</option>';
+    produtos.forEach(produtoDoc => {
+        const produto = produtoDoc.data();
+        const option = document.createElement('option');
+        option.value = produtoDoc.id;
+        option.textContent = `${produto.codigo || ''} - ${produto.name}`;
+        option.dataset.codigo = produto.codigo || '';
+        option.dataset.nome = produto.name || '';
+        option.dataset.preco = produto.cost_price || 0;
+        produtoSelect.appendChild(option);
+    });
+}
+
+function adicionarProdutoPedido() {
+    const select = document.getElementById('pedidoProduto');
+    const option = select.options[select.selectedIndex];
+    if (!option || !option.value) {
+        showToast('Selecione um produto', 'warning');
+        return;
+    }
+
+    pedidoItensTemp.push({
+        produtoId: option.value,
+        codigo: option.dataset.codigo,
+        nome: option.dataset.nome,
+        quantidade: 1,
+        preco: parseFloat(option.dataset.preco) || 0,
+        desconto: 0
+    });
+    renderPedidoItens();
+    select.value = '';
+}
+
+function renderPedidoItens() {
+    const tbody = document.getElementById('pedidoItens');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+    let subtotal = 0;
+
+    pedidoItensTemp.forEach((item, index) => {
+        const itemTotal = item.quantidade * item.preco - item.desconto;
+        subtotal += itemTotal;
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${item.codigo}</td>
+            <td>${item.nome}</td>
+            <td>UN</td>
+            <td>${item.quantidade}</td>
+            <td>R$ ${item.preco.toFixed(2)}</td>
+            <td>R$ ${item.desconto.toFixed(2)}</td>
+            <td>R$ ${itemTotal.toFixed(2)}</td>
+            <td><button type="button" class="action-btn delete" data-pedido-item="${index}">Excluir</button></td>
+        `;
+        row.querySelector('[data-pedido-item]').addEventListener('click', () => {
+            pedidoItensTemp.splice(index, 1);
+            renderPedidoItens();
+        });
+        tbody.appendChild(row);
+    });
+
+    if (pedidoItensTemp.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="empty-message">Nenhum produto adicionado</td></tr>';
+    }
+
+    const desconto = parseFloat(document.getElementById('pedidoDesconto')?.value || 0);
+    const frete = parseFloat(document.getElementById('pedidoFrete')?.value || 0);
+    document.getElementById('pedidoSubtotal').textContent = `R$ ${subtotal.toFixed(2)}`;
+    document.getElementById('pedidoTotal').textContent = `R$ ${(subtotal - desconto + frete).toFixed(2)}`;
+}
+
+async function salvarPedido(event) {
+    event.preventDefault();
+    const user = auth.currentUser;
+    if (!user) {
+        showToast('Faça login para registrar pedidos', 'error');
+        return;
+    }
+    if (!pedidoItensTemp.length) {
+        showToast('Adicione pelo menos um produto', 'warning');
+        return;
+    }
+
+    const fornecedorSelect = document.getElementById('pedidoFornecedor');
+    const data = document.getElementById('pedidoData').value;
+    const pagamento = document.getElementById('pedidoPagamento').value;
+    const subtotal = pedidoItensTemp.reduce((total, item) => total + item.quantidade * item.preco - item.desconto, 0);
+    const desconto = parseFloat(document.getElementById('pedidoDesconto').value) || 0;
+    const frete = parseFloat(document.getElementById('pedidoFrete').value) || 0;
+
+    try {
+        await addDoc(collection(db, 'users', user.uid, 'purchases'), {
+            codigo: generateCode('COMP'),
+            supplier_id: fornecedorSelect.value,
+            supplier_name: fornecedorSelect.options[fornecedorSelect.selectedIndex].textContent,
+            purchase_date: data,
+            payment_type: pagamento,
+            items: pedidoItensTemp,
+            subtotal,
+            total_discount: desconto,
+            freight: frete,
+            total_value: subtotal - desconto + frete,
+            status: 'pending',
+            created_at: new Date().toISOString()
+        });
+        showToast('Pedido registrado com sucesso', 'success');
+        document.getElementById('pedidoForm').reset();
+        pedidoItensTemp = [];
+        renderPedidoItens();
+        document.getElementById('pedidoModal').style.display = 'none';
+    } catch (error) {
+        console.error('Erro ao salvar pedido:', error);
+        showToast('Erro ao salvar pedido: ' + error.message, 'error');
+    }
+}
+
+// ============================================
 // CADASTRO DE PRODUTOS - CADASTRO-PRODUTOS.HTML
 // ============================================
+
+let produtoEmEdicaoId = null;
 
 async function loadProdutos() {
     const user = auth.currentUser;
@@ -468,7 +739,10 @@ async function loadProdutos() {
 
 async function openProdutoModal(produtoId = null, edit = false) {
     const user = auth.currentUser;
-    if (!user) return;
+    if (!user) {
+        showToast('Faça login para cadastrar produtos', 'error');
+        return;
+    }
 
     const modal = document.getElementById('produtoModal');
     const form = document.getElementById('produtoForm');
@@ -493,6 +767,7 @@ async function openProdutoModal(produtoId = null, edit = false) {
 
     // Limpar formulário
     form.reset();
+    produtoEmEdicaoId = edit && produtoId ? produtoId : null;
     document.getElementById('produtoModalTitle').textContent = 'Novo Produto';
 
     if (edit && produtoId) {
@@ -529,16 +804,7 @@ async function openProdutoModal(produtoId = null, edit = false) {
 
             document.getElementById('produtoModalTitle').textContent = 'Editar Produto';
 
-            form.onsubmit = async (e) => {
-                e.preventDefault();
-                await salvarProduto(produtoId);
-            };
         }
-    } else {
-        form.onsubmit = async (e) => {
-            e.preventDefault();
-            await salvarProduto();
-        };
     }
 
     modal.style.display = 'flex';
@@ -546,7 +812,10 @@ async function openProdutoModal(produtoId = null, edit = false) {
 
 async function salvarProduto(produtoId = null) {
     const user = auth.currentUser;
-    if (!user) return;
+    if (!user) {
+        showToast('Faça login para salvar o produto', 'error');
+        return;
+    }
 
     const fornecedores = Array.from(document.getElementById('produtoFornecedor').selectedOptions).map(opt => opt.value);
 
@@ -563,6 +832,12 @@ async function salvarProduto(produtoId = null) {
         updated_at: new Date().toISOString()
     };
 
+    const submitButton = document.querySelector('#produtoForm button[type="submit"]');
+    if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.textContent = 'Salvando...';
+    }
+
     try {
         if (produtoId) {
             await updateDoc(doc(db, 'users', user.uid, 'products', produtoId), dados);
@@ -575,10 +850,16 @@ async function salvarProduto(produtoId = null) {
         }
 
         document.getElementById('produtoModal').style.display = 'none';
+        produtoEmEdicaoId = null;
         loadProdutos();
     } catch (error) {
         console.error('Erro ao salvar produto:', error);
         showToast('Erro ao salvar produto: ' + error.message, 'error');
+    } finally {
+        if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.textContent = 'Salvar Produto';
+        }
     }
 }
 
@@ -609,6 +890,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (currentPage.includes('cadastro-clientes')) {
         loadClientes();
         document.getElementById('btnNovoCliente')?.addEventListener('click', () => openClienteModal());
+        document.getElementById('clienteForm')?.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            await salvarCliente(clienteEmEdicaoId);
+        });
         document.getElementById('closeClienteModal')?.addEventListener('click', () => {
             document.getElementById('clienteModal').style.display = 'none';
         });
@@ -618,15 +903,59 @@ document.addEventListener('DOMContentLoaded', () => {
     } else if (currentPage.includes('cadastro-fornecedores')) {
         loadFornecedores();
         document.getElementById('btnNovoFornecedor')?.addEventListener('click', () => openFornecedorModal());
+        document.getElementById('fornecedorForm')?.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            await salvarFornecedor(fornecedorEmEdicaoId);
+        });
         document.getElementById('closeFornecedorModal')?.addEventListener('click', () => {
             document.getElementById('fornecedorModal').style.display = 'none';
         });
         document.getElementById('cancelFornecedorBtn')?.addEventListener('click', () => {
             document.getElementById('fornecedorModal').style.display = 'none';
         });
+    } else if (currentPage.includes('compras-custos')) {
+        loadCustos();
+        document.getElementById('custoForm')?.addEventListener('submit', salvarCusto);
+        document.getElementById('closeCustoModal')?.addEventListener('click', () => {
+            document.getElementById('custoModal').style.display = 'none';
+        });
+        document.getElementById('cancelCustoBtn')?.addEventListener('click', () => {
+            document.getElementById('custoModal').style.display = 'none';
+        });
+    } else if (currentPage.includes('compras-precificar')) {
+        loadPrecificacao();
+        document.getElementById('precificacaoForm')?.addEventListener('submit', salvarPrecificacao);
+        document.getElementById('closePrecificacaoModal')?.addEventListener('click', () => {
+            document.getElementById('precificacaoModal').style.display = 'none';
+        });
+        document.getElementById('cancelPrecBtn')?.addEventListener('click', () => {
+            document.getElementById('precificacaoModal').style.display = 'none';
+        });
+    } else if (currentPage.includes('compras-pedidos')) {
+        document.getElementById('btnNovoPedido')?.addEventListener('click', async () => {
+            pedidoItensTemp = [];
+            document.getElementById('pedidoForm')?.reset();
+            renderPedidoItens();
+            await carregarOpcoesPedido();
+            document.getElementById('pedidoModal').style.display = 'flex';
+        });
+        document.getElementById('btnAdicionarProduto')?.addEventListener('click', adicionarProdutoPedido);
+        document.getElementById('pedidoForm')?.addEventListener('submit', salvarPedido);
+        document.getElementById('pedidoDesconto')?.addEventListener('input', renderPedidoItens);
+        document.getElementById('pedidoFrete')?.addEventListener('input', renderPedidoItens);
+        document.getElementById('closePedidoModal')?.addEventListener('click', () => {
+            document.getElementById('pedidoModal').style.display = 'none';
+        });
+        document.getElementById('cancelPedidoBtn')?.addEventListener('click', () => {
+            document.getElementById('pedidoModal').style.display = 'none';
+        });
     } else if (currentPage.includes('cadastro-produtos')) {
         loadProdutos();
         document.getElementById('btnNovoProduto')?.addEventListener('click', () => openProdutoModal());
+        document.getElementById('produtoForm')?.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            await salvarProduto(produtoEmEdicaoId);
+        });
         document.getElementById('btnImportarExcel')?.addEventListener('click', () => importarProdutosExcel());
         document.getElementById('closeProdutoModal')?.addEventListener('click', () => {
             document.getElementById('produtoModal').style.display = 'none';

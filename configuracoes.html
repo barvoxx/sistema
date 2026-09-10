@@ -133,12 +133,6 @@
     </main>
 
     <!-- Scripts -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js"></script>
-    <script src="firebase-config.js"></script>
-    <script src="auth.js"></script>
-    <script src="utils.js"></script>
     <script>
         fetch('menu-lateral.html')
             .then(response => response.text())
@@ -149,7 +143,11 @@
                 }
             });
     </script>
-    <script>
+    <script type="module">
+        import { auth, db, doc, deleteDoc, updateDoc } from './firebase-config.js';
+        import { getUserData, updateUserData } from './auth.js';
+        import { showToast } from './utils.js';
+
         // Carregar dados do perfil
         async function loadPerfilData() {
             const user = auth.currentUser;
@@ -157,15 +155,16 @@
 
             try {
                 const userData = await getUserData();
-                if (userData) {
-                    document.getElementById('nomeDaEmpresa').value = userData.company_name || '';
-                    document.getElementById('nomeResponsavel').value = userData.username || '';
-                    document.getElementById('emailEmpresa').value = userData.email || '';
-                    document.getElementById('telefonEmpresa').value = userData.phone || '';
-                    document.getElementById('cnpj').value = userData.cnpj || '';
-                    document.getElementById('inscricaoEstadual').value = userData.state_registration || '';
-                    document.getElementById('endereco').value = userData.address || '';
-                    document.getElementById('cidade').value = userData.city || '';
+                if (userData.success && userData.data) {
+                    const data = userData.data;
+                    document.getElementById('nomeDaEmpresa').value = data.company_name || '';
+                    document.getElementById('nomeResponsavel').value = data.username || '';
+                    document.getElementById('emailEmpresa').value = data.email || '';
+                    document.getElementById('telefonEmpresa').value = data.phone || '';
+                    document.getElementById('cnpj').value = data.cnpj || '';
+                    document.getElementById('inscricaoEstadual').value = data.state_registration || '';
+                    document.getElementById('endereco').value = data.address || '';
+                    document.getElementById('cidade').value = data.city || '';
                 }
             } catch (error) {
                 console.error('Erro ao carregar perfil:', error);
@@ -189,8 +188,8 @@
             };
 
             try {
-                await updateUserData(userData);
-                showToast('Perfil atualizado com sucesso', 'success');
+                const result = await updateUserData(userData);
+                showToast(result.success ? 'Perfil atualizado com sucesso' : result.message, result.success ? 'success' : 'error');
             } catch (error) {
                 console.error('Erro ao atualizar perfil:', error);
                 showToast('Erro ao atualizar perfil', 'error');
@@ -211,7 +210,7 @@
             };
 
             try {
-                await db.collection('users').doc(user.uid).update(prefs);
+                await updateDoc(doc(db, 'users', user.uid), prefs);
                 showToast('Preferências salvas com sucesso', 'success');
             } catch (error) {
                 console.error('Erro ao salvar preferências:', error);
@@ -260,7 +259,7 @@
 
             try {
                 // Deletar dados do usuário do Firestore
-                await db.collection('users').doc(user.uid).delete();
+                await deleteDoc(doc(db, 'users', user.uid));
 
                 // Deletar conta do Firebase Auth
                 await user.delete();

@@ -45,11 +45,9 @@ async function loadVendaProdutos() {
     if (!user) return;
 
     try {
-        const snapshot = await db.collection('users')
-            .doc(user.uid)
-            .collection('products')
-            .orderBy('name')
-            .get();
+        const snapshot = await getDocs(
+            query(collection(db, 'users', user.uid, 'products'), orderBy('name'))
+        );
 
         const select = document.getElementById('vendaProduto');
         if (!select) return;
